@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Korean typography - prevent unnatural mid-syllable line breaks */
+body, button, input, textarea, select, h1, h2, h3, h4, h5, h6, p, span {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 /* Official Google Sign-In Button styles */
 .gsi-material-button {
   user-select: none;
@@ -108,4 +114,18 @@
 
 .animate-wave-float {
   animation: wavePulse 3s ease-in-out infinite;
+}
+
+/* Hide scrollbar for clean horizontal mobile swipes */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Safe area for mobile navigation */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
 }

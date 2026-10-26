@@ -1,22 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User } from 'firebase/auth';
-import { initAuth, googleSignIn, logout, getAccessToken } from './services/auth';
+import { initAuth, googleSignIn, logout } from './services/auth';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { MarineConditions } from './components/MarineConditions';
 import { GwangalliCourseMap } from './components/GwangalliCourseMap';
 import { TriathlonTraining } from './components/TriathlonTraining';
 import { SwimLogger } from './components/SwimLogger';
 import { SafetyAndLocalGuide } from './components/SafetyAndLocalGuide';
+import { GSRCommunity } from './components/GSRCommunity';
 import { GoogleDriveSyncModal } from './components/GoogleDriveSyncModal';
+import { ColdWaterAlertModal } from './components/ColdWaterAlertModal';
+import { ColdWaterWarningBanner } from './components/ColdWaterWarningBanner';
+import { playColdWaterWarningSound, sendBrowserNotification } from './utils/alertSound';
 import { CURRENT_GWANGALLI_CONDITION, INITIAL_SWIM_LOGS } from './data/gwangalliData';
-import { SwimLog } from './types/swim';
+import { SwimLog, ColdWaterAlertSettings, MarineCondition } from './types/swim';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('marine');
   const [user, setUser] = useState<User | null>(null);
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
-  const [marineCondition, setMarineCondition] = useState(CURRENT_GWANGALLI_CONDITION);
+  const [isColdWaterModalOpen, setIsColdWaterModalOpen] = useState(false);
+  const [marineCondition, setMarineCondition] = useState<MarineCondition>(CURRENT_GWANGALLI_CONDITION);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  // Cold Water Alert Settings (Default 18.0°C threshold as requested)
+  const [coldWaterSettings, setColdWaterSettings] = useState<ColdWaterAlertSettings>(() => {
+    try {
+      const saved = localStorage.getItem('gwangalli_cold_water_alert_settings');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      enabled: true,
+      thresholdTemp: 18.0,
+      browserNotification: true,
+      soundAlert: true,
+      preventHypothermiaTips: true,
+    };
+  });
 
   // Swim logs state (persisted locally with Google Drive sync capabilities)
   const [logs, setLogs] = useState<SwimLog[]>(() => {
@@ -47,6 +68,48 @@ export default function App() {
       console.warn('Failed to save to localStorage', e);
     }
   }, [logs]);
+
+  // Sync cold water settings to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('gwangalli_cold_water_alert_settings', JSON.stringify(coldWaterSettings));
+    } catch (e) {
+      console.warn('Failed to save cold water settings to localStorage', e);
+    }
+  }, [coldWaterSettings]);
+
+  // Monitor Cold Water Conditions
+  const prevTriggeredRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    const isTriggered =
+      coldWaterSettings.enabled && marineCondition.waterTemp <= coldWaterSettings.thresholdTemp;
+
+    // Trigger alert only when transition occurs into cold water state
+    if (isTriggered && !prevTriggeredRef.current) {
+      setBannerDismissed(false);
+
+      // 1. Play audio chime if enabled
+      if (coldWaterSettings.soundAlert) {
+        playColdWaterWarningSound();
+      }
+
+      // 2. Send native browser notification if enabled
+      if (coldWaterSettings.browserNotification) {
+        sendBrowserNotification('❄️ [광안리 냉수 주의보 발령]', {
+          body: `현재 수온이 ${marineCondition.waterTemp}℃로 기준치(${coldWaterSettings.thresholdTemp}℃ 이하)에 도달했습니다. 웻슈트 착용 및 저체온증에 각별히 유의하세요!`,
+        });
+      }
+
+      // 3. Show in-app toast
+      showToast(
+        `❄️ [냉수 주의보] 광안리 수온이 ${marineCondition.waterTemp}℃로 설정 기준치(${coldWaterSettings.thresholdTemp}℃) 이하입니다! 보온 슈트 착용 필수`,
+        'error'
+      );
+    }
+
+    prevTriggeredRef.current = isTriggered;
+  }, [marineCondition.waterTemp, coldWaterSettings]);
 
   // Initialize Firebase Auth listener as requested by Google Workspace Skill
   useEffect(() => {
@@ -114,6 +177,21 @@ export default function App() {
     setLogs(restoredLogs);
   };
 
+  // Test Alert Handler
+  const handleTestAlert = () => {
+    playColdWaterWarningSound();
+    sendBrowserNotification('❄️ [테스트] 광안리 냉수 주의보 알림', {
+      body: `현재 설정된 기준치(${coldWaterSettings.thresholdTemp}℃) 알림 테스트입니다. 소리와 알림이 정상 작동합니다.`,
+    });
+    showToast(`❄️ [냉수 주의보 테스트] 기준 ${coldWaterSettings.thresholdTemp}℃ 경고 알림 테스트가 발송되었습니다.`, 'info');
+  };
+
+  // When user changes season preset or condition in MarineConditions
+  const handleConditionChange = (newCondition: MarineCondition) => {
+    setMarineCondition(newCondition);
+    setBannerDismissed(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#070e17] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-slate-950">
       {/* Navigation Header */}
@@ -126,14 +204,29 @@ export default function App() {
         onOpenDriveModal={() => setIsDriveModalOpen(true)}
         waterTemp={marineCondition.waterTemp}
         tideName={marineCondition.tideName}
+        coldWaterSettings={coldWaterSettings}
+        onOpenColdWaterModal={() => setIsColdWaterModalOpen(true)}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-28 lg:pb-8">
+        {/* Prominent Cold Water Warning Banner */}
+        {!bannerDismissed && (
+          <ColdWaterWarningBanner
+            waterTemp={marineCondition.waterTemp}
+            settings={coldWaterSettings}
+            onOpenSettings={() => setIsColdWaterModalOpen(true)}
+            onDismiss={() => setBannerDismissed(true)}
+          />
+        )}
+
         {activeTab === 'marine' && (
           <MarineConditions
             condition={marineCondition}
             onRefresh={() => showToast('광안리 연안 최신 해황 정보를 갱신했습니다.', 'success')}
+            coldWaterSettings={coldWaterSettings}
+            onOpenColdWaterModal={() => setIsColdWaterModalOpen(true)}
+            onConditionChange={handleConditionChange}
           />
         )}
 
@@ -146,6 +239,8 @@ export default function App() {
         )}
 
         {activeTab === 'triathlon' && <TriathlonTraining />}
+
+        {activeTab === 'gsr' && <GSRCommunity onNotify={showToast} />}
 
         {activeTab === 'logs' && (
           <SwimLogger
@@ -160,6 +255,19 @@ export default function App() {
 
         {activeTab === 'guide' && <SafetyAndLocalGuide />}
       </main>
+
+      {/* Cold Water Alert Settings Modal */}
+      <ColdWaterAlertModal
+        isOpen={isColdWaterModalOpen}
+        onClose={() => setIsColdWaterModalOpen(false)}
+        settings={coldWaterSettings}
+        onSaveSettings={(newSettings) => {
+          setColdWaterSettings(newSettings);
+          showToast(`냉수 주의보 설정이 저장되었습니다. (기준 수온: ${newSettings.thresholdTemp}℃ 이하)`, 'success');
+        }}
+        currentWaterTemp={marineCondition.waterTemp}
+        onTestAlert={handleTestAlert}
+      />
 
       {/* Google Drive Sync & Backup Modal */}
       <GoogleDriveSyncModal
@@ -194,15 +302,25 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-slate-400">
-            광안리 바다수영 & 철인3종 메이트 · 안전한 오픈워터 수영을 응원합니다.
-          </p>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <span className="font-extrabold text-white">TEAM_GSR</span>
+            <span className="text-cyan-400 font-bold">Gwangalli Swimming Running</span>
+            <span>· 새벽, 바다와 함께 시작하는 하루</span>
+            <a
+              href="https://www.instagram.com/team__gsr"
+              target="_blank"
+              rel="noreferrer"
+              className="text-pink-400 hover:underline font-bold"
+            >
+              @team__gsr
+            </a>
+          </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
-            <span>수영구 광안리해수욕장</span>
+            <span>광안리해수욕장</span>
             <span>·</span>
-            <span>해양경찰 / 119 수상구조대</span>
+            <span>하계 06:00 / 동계 06:30</span>
             <span>·</span>
-            <span>Google Drive 연동</span>
+            <span>Google Drive 백업</span>
           </div>
         </div>
       </footer>

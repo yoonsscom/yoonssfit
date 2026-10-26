@@ -29,6 +29,7 @@ export const TriathlonTraining: React.FC = () => {
   const [isSoundMuted, setIsSoundMuted] = useState<boolean>(false);
   const [metronomeSide, setMetronomeSide] = useState<'left' | 'right'>('left');
   const [strokeCount, setStrokeCount] = useState<number>(0);
+  const strokeCountRef = useRef<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   // Play audio beep for metronome
@@ -67,15 +68,15 @@ export const TriathlonTraining: React.FC = () => {
     if (isMetronomePlaying) {
       const intervalMs = (60 / cadenceSpm) * 1000;
       timerId = setInterval(() => {
-        setStrokeCount((prev) => {
-          const next = prev + 1;
-          const isSighting = next % selectedStandard.sightingIntervalStrokes === 0;
-          playBeep(isSighting ? 1200 : 800, 0.06);
-          return next;
-        });
+        strokeCountRef.current += 1;
+        const currentCount = strokeCountRef.current;
+        const isSighting = currentCount % selectedStandard.sightingIntervalStrokes === 0;
+        playBeep(isSighting ? 1200 : 800, 0.06);
+        setStrokeCount(currentCount);
         setMetronomeSide((prev) => (prev === 'left' ? 'right' : 'left'));
       }, intervalMs);
     } else {
+      strokeCountRef.current = 0;
       setStrokeCount(0);
     }
 
@@ -116,15 +117,15 @@ export const TriathlonTraining: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60 self-start sm:self-auto">
+          <div className="grid grid-cols-3 sm:flex items-center gap-1.5 bg-slate-800 p-1.5 rounded-xl border border-slate-700 w-full sm:w-auto">
             {TRIATHLON_STANDARDS.map((std) => (
               <button
                 key={std.category}
                 onClick={() => setSelectedStandard(std)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold text-center transition-all ${
                   selectedStandard.category === std.category
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/25 font-black'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
                 {std.category.split(' ')[0]}
@@ -356,10 +357,10 @@ export const TriathlonTraining: React.FC = () => {
               <div className="mt-5 flex justify-center">
                 <button
                   onClick={() => setIsMetronomePlaying(!isMetronomePlaying)}
-                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-2.5 rounded-xl font-black text-sm active:scale-95 transition-all ${
                     isMetronomePlaying
-                      ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30'
-                      : 'bg-teal-500 hover:bg-teal-400 text-slate-950 shadow-lg shadow-teal-500/30'
+                      ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/40'
+                      : 'bg-teal-400 hover:bg-teal-300 text-slate-950 shadow-lg shadow-teal-500/30'
                   }`}
                 >
                   {isMetronomePlaying ? (

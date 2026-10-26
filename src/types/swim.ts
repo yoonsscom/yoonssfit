@@ -48,7 +48,7 @@ export interface SwimLog {
   buoyUsed: boolean;
   waterTemp: number;
   perceivedEffort: number; // 1-10 RPE
-  targetCategory: '철인3종 훈련 (Triathlon)' | '체력단련/피트니스 (Fitness)' | '바다적응/투어 (Tour)';
+  targetCategory: 'GSR 새벽 정기훈련' | 'GSR 철인 훈련팀' | '철인3종 훈련 (Triathlon)' | '체력단련/피트니스 (Fitness)' | '바다적응/투어 (Tour)';
   notes: string;
   buddies?: string;
   createdAt: string;
@@ -62,4 +62,24 @@ export interface TriathlonTarget {
   goalTimeMinutes: number;
   sightingIntervalStrokes: number;
   estimatedCalories: number;
+}
+
+export interface ColdWaterAlertSettings {
+  enabled: boolean;
+  thresholdTemp: number; // default 18.0 °C
+  browserNotification: boolean;
+  soundAlert: boolean;
+  preventHypothermiaTips: boolean;
+}
+
+export interface GSREvent {
+  id: string;
+  title: string;
+  category: '아쿠아슬론' | '마라톤' | '철인3종' | '특별활동' | '정기새벽훈련';
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  tag: string;
+  participantsCount: number;
 }

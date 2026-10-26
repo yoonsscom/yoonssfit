@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MarineCondition } from '../types/swim';
+import { MarineCondition, ColdWaterAlertSettings } from '../types/swim';
 import {
   Waves,
   Thermometer,
@@ -12,12 +12,16 @@ import {
   RefreshCw,
   Info,
   Clock,
-  Sparkles
+  Sparkles,
+  Snowflake
 } from 'lucide-react';
 
 interface MarineConditionsProps {
   condition: MarineCondition;
   onRefresh?: () => void;
+  coldWaterSettings: ColdWaterAlertSettings;
+  onOpenColdWaterModal: () => void;
+  onConditionChange?: (condition: MarineCondition) => void;
 }
 
 type SeasonPresetKey = 'current' | 'early_summer' | 'hot_summer' | 'cool_autumn' | 'winter';
@@ -25,6 +29,9 @@ type SeasonPresetKey = 'current' | 'early_summer' | 'hot_summer' | 'cool_autumn'
 export const MarineConditions: React.FC<MarineConditionsProps> = ({
   condition: initialCondition,
   onRefresh,
+  coldWaterSettings,
+  onOpenColdWaterModal,
+  onConditionChange,
 }) => {
   const [condition, setCondition] = useState<MarineCondition>(initialCondition);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -133,20 +140,22 @@ export const MarineConditions: React.FC<MarineConditionsProps> = ({
     },
   };
 
-  const handlePresetChange = (key: keyof typeof presets) => {
+  const handlePresetChange = (key: SeasonPresetKey) => {
     setSelectedSeasonPreset(key);
-    setCondition((prev) => ({
-      ...prev,
+    const updated = {
+      ...condition,
       ...presets[key].data,
       timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-    }));
+    };
+    setCondition(updated);
+    if (onConditionChange) onConditionChange(updated);
   };
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
-      setCondition((prev) => ({
+      setCondition((prev: MarineCondition) => ({
         ...prev,
         timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
       }));
@@ -194,36 +203,36 @@ export const MarineConditions: React.FC<MarineConditionsProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner / Marine Status Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-blue-800/40 p-5 md:p-7 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-blue-800/60 p-4 sm:p-6 md:p-7 shadow-xl">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping mr-1.5 inline-block"></span>
-                실시간 광안리 연안 부이 데이터
+                실시간 광안리 연안 부이
               </span>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-slate-500" />
-                업데이트: {condition.timestamp}
+              <span className="text-xs text-slate-300 font-medium flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                {condition.timestamp}
               </span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-2 flex items-center gap-3">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white mt-2 flex flex-wrap items-center gap-2">
               부산 광안리해수욕장 해황 레이더
-              <span className="text-xs font-normal px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">
                 광안대교 앞바다
               </span>
             </h2>
-            <p className="text-sm text-slate-300 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl font-medium">
               광안리 바다수영과 철인3종 오픈워터 트레이닝을 위한 수온, 조석(물때), 파고, 유속 및 슈트 착용 기준
             </p>
           </div>
 
-          <div className="flex items-center gap-3 self-start md:self-auto">
+          <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 transition-colors active:scale-95 disabled:opacity-50 shadow-sm"
               title="데이터 새로고침"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
@@ -232,145 +241,171 @@ export const MarineConditions: React.FC<MarineConditionsProps> = ({
           </div>
         </div>
 
-        {/* Season & Condition Preset Selector */}
-        <div className="mt-5 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-400 flex items-center gap-1 mr-1">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            해황 시뮬레이션:
-          </span>
-          {Object.entries(presets).map(([key, item]) => (
-            <button
-              key={key}
-              onClick={() => handlePresetChange(key as any)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                selectedSeasonPreset === key
-                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
-                  : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Season & Condition Preset Selector - Horizontal Swipe on Mobile */}
+        <div className="mt-4 pt-3.5 border-t border-slate-800/90">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-xs font-bold text-slate-300">
+              해황 계절별 시뮬레이션 (수온/파고 테스트):
+            </span>
+          </div>
+          <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1">
+            {Object.entries(presets).map(([key, item]) => (
+              <button
+                key={key}
+                onClick={() => handlePresetChange(key as any)}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  selectedSeasonPreset === key
+                    ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-black shadow-md shadow-cyan-500/30'
+                    : 'bg-slate-800/90 hover:bg-slate-700 text-slate-200 border-slate-700/80'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Primary Metrics Grid - 2 Column on Mobile for Immediate Glance */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Metric 1: Water Temp */}
-        <div className="bg-slate-900/90 border border-blue-900/40 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm group hover:border-cyan-500/50 transition-all">
+        <div className="bg-slate-900 border border-slate-700/90 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden shadow-lg group hover:border-cyan-400/60 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Thermometer className="w-4 h-4 text-cyan-400" />
-              실시간 표층 수온
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Thermometer className="w-4 h-4 text-cyan-400 shrink-0" />
+              표층 수온
             </span>
-            <span className="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+            <span className="text-[11px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded font-bold border border-slate-700">
               기온 {condition.airTemp}℃
             </span>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-4xl font-black text-white tracking-tight">{condition.waterTemp}</span>
-            <span className="text-xl font-bold text-cyan-400">°C</span>
+
+          <div className="mt-2.5 sm:mt-3 flex items-baseline justify-between flex-wrap gap-1">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{condition.waterTemp}</span>
+              <span className="text-lg font-bold text-cyan-400">°C</span>
+            </div>
+            {coldWaterSettings.enabled && condition.waterTemp <= coldWaterSettings.thresholdTemp ? (
+              <span className="text-[11px] font-black text-rose-300 bg-rose-950/80 border border-rose-600 px-2 py-0.5 rounded-lg animate-pulse flex items-center gap-1">
+                <Snowflake className="w-3 h-3" />
+                냉수주의보
+              </span>
+            ) : (
+              <button
+                onClick={onOpenColdWaterModal}
+                className="text-[10px] font-bold text-cyan-300 bg-cyan-950/70 border border-cyan-800 px-2 py-0.5 rounded"
+              >
+                주의보 {coldWaterSettings.thresholdTemp}℃
+              </button>
+            )}
           </div>
-          <div className="mt-3">
+
+          <div className="mt-2.5">
             <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden flex">
-              {/* Cold to Warm temperature bar */}
               <div
                 className="bg-gradient-to-r from-blue-500 via-cyan-400 to-amber-400 h-full rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.max(15, ((condition.waterTemp - 10) / 20) * 100))}%` }}
               ></div>
             </div>
-            <p className="text-xs text-slate-300 mt-2 font-medium">
-              {condition.waterTemp >= 21 ? '따뜻함 (장시간 수영 쾌적)' : condition.waterTemp >= 17 ? '적정 (웻슈트 착용 시 쾌적)' : '저수온 (충분한 준비운동)'}
+            <p className="text-[11px] text-slate-200 mt-1.5 font-bold line-clamp-1">
+              {condition.waterTemp >= 21 ? '따뜻함 (쾌적)' : condition.waterTemp >= 17 ? '적정 (웻슈트 착용)' : '저수온 (보온장비 필수)'}
             </p>
           </div>
         </div>
 
         {/* Metric 2: Tide & Current */}
-        <div className="bg-slate-900/90 border border-blue-900/40 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm group hover:border-cyan-500/50 transition-all">
+        <div className="bg-slate-900 border border-slate-700/90 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden shadow-lg group hover:border-blue-400/60 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Waves className="w-4 h-4 text-blue-400" />
-              조석 & 물때 (Tide)
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Waves className="w-4 h-4 text-blue-400 shrink-0" />
+              조석·물때
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-              {condition.tideName}
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-500/25 text-blue-200 border border-blue-400/40">
+              {condition.tideName.split(' ')[0]}
             </span>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-white">{condition.tidePhase}</span>
+
+          <div className="mt-2.5 sm:mt-3 flex items-baseline gap-2">
+            <span className="text-xl sm:text-2xl font-black text-white">{condition.tidePhase.split(' ')[0]}</span>
           </div>
-          <div className="mt-3 text-xs space-y-1 text-slate-300">
+
+          <div className="mt-2 text-[11px] space-y-1 text-slate-200">
             <div className="flex justify-between py-0.5 border-b border-slate-800">
               <span className="text-slate-400">현재 조위:</span>
-              <span className="font-semibold text-white">{condition.tideLevel} cm</span>
+              <span className="font-bold text-white">{condition.tideLevel} cm</span>
             </div>
             <div className="flex justify-between py-0.5">
-              <span className="text-slate-400">다음 조석:</span>
-              <span className="font-semibold text-cyan-300">{condition.nextTideTime}</span>
+              <span className="text-slate-400">다음:</span>
+              <span className="font-bold text-cyan-300 truncate">{condition.nextTideTime.split(' ')[0]} {condition.nextTideType.split(' ')[0]}</span>
             </div>
           </div>
         </div>
 
         {/* Metric 3: Wave & Wind */}
-        <div className="bg-slate-900/90 border border-blue-900/40 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm group hover:border-cyan-500/50 transition-all">
+        <div className="bg-slate-900 border border-slate-700/90 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden shadow-lg group hover:border-teal-400/60 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Wind className="w-4 h-4 text-teal-400" />
-              파고 & 풍향 (Wave & Wind)
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Wind className="w-4 h-4 text-teal-400 shrink-0" />
+              파고·풍향
             </span>
-            <span className="text-xs text-teal-300 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
-              {condition.waveHeight <= 0.5 ? '잔잔함' : condition.waveHeight <= 1.0 ? '보통' : '너울 주의'}
+            <span className="text-[11px] text-teal-200 bg-teal-500/20 px-2 py-0.5 rounded font-bold border border-teal-500/30">
+              {condition.waveHeight <= 0.5 ? '잔잔함' : condition.waveHeight <= 1.0 ? '보통' : '너울'}
             </span>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
+
+          <div className="mt-2.5 sm:mt-3 flex items-baseline gap-1.5">
             <span className="text-3xl font-black text-white">{condition.waveHeight}</span>
-            <span className="text-lg font-bold text-teal-400">m</span>
-            <span className="text-xs text-slate-400 ml-1">주기 {condition.wavePeriod}s</span>
+            <span className="text-base font-bold text-teal-300">m</span>
+            <span className="text-[11px] text-slate-300 ml-1">주기 {condition.wavePeriod}s</span>
           </div>
-          <div className="mt-3 text-xs space-y-1 text-slate-300">
+
+          <div className="mt-2 text-[11px] space-y-1 text-slate-200">
             <div className="flex justify-between py-0.5 border-b border-slate-800">
-              <span className="text-slate-400">풍속 / 풍향:</span>
-              <span className="font-semibold text-white">{condition.windSpeed} m/s ({condition.windDirection})</span>
+              <span className="text-slate-400">바람:</span>
+              <span className="font-bold text-white">{condition.windSpeed}m/s</span>
             </div>
             <div className="flex justify-between py-0.5">
               <span className="text-slate-400">수중 시야:</span>
-              <span className="font-semibold text-teal-300">약 {condition.visibility}m</span>
+              <span className="font-bold text-teal-300">약 {condition.visibility}m</span>
             </div>
           </div>
         </div>
 
         {/* Metric 4: Safety Score */}
-        <div className="bg-slate-900/90 border border-blue-900/40 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm group hover:border-cyan-500/50 transition-all">
+        <div className="bg-slate-900 border border-slate-700/90 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden shadow-lg group hover:border-emerald-400/60 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4 text-emerald-400" />
-              바다수영 안전도 지수
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4 text-emerald-400 shrink-0" />
+              안전 지수
             </span>
             <span
-              className={`text-xs font-bold px-2 py-0.5 rounded ${
+              className={`text-[11px] font-black px-2 py-0.5 rounded ${
                 condition.safetyScore >= 80
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  ? 'bg-emerald-500/25 text-emerald-200 border border-emerald-400/40'
                   : condition.safetyScore >= 60
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  ? 'bg-amber-500/25 text-amber-200 border border-amber-400/40'
+                  : 'bg-rose-500/25 text-rose-200 border border-rose-400/40'
               }`}
             >
-              {condition.safetyLevel}
+              {condition.safetyLevel.split(' ')[0]}
             </span>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-4xl font-black text-white">{condition.safetyScore}</span>
-            <span className="text-lg font-bold text-slate-400">/ 100</span>
+
+          <div className="mt-2.5 sm:mt-3 flex items-baseline gap-1">
+            <span className="text-3xl sm:text-4xl font-black text-white">{condition.safetyScore}</span>
+            <span className="text-sm font-bold text-slate-400">/ 100</span>
           </div>
-          <div className="mt-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-300">
-              <span className="text-slate-400">해파리 모니터링:</span>
-              <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                {condition.jellyfishStatus}
+
+          <div className="mt-2">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-200">
+              <span className="text-slate-400">해파리:</span>
+              <span className="font-bold text-emerald-300 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                안전(정상)
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">{condition.jellyfishDesc}</p>
+            <p className="text-[10px] text-slate-300 mt-1 line-clamp-1">{condition.jellyfishDesc}</p>
           </div>
         </div>
       </div>

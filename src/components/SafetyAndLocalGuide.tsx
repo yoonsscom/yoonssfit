@@ -58,29 +58,49 @@ export const SafetyAndLocalGuide: React.FC = () => {
         ))}
       </div>
 
-      {/* Seasonal Water Temperature Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6">
-        <h4 className="text-base font-bold text-white flex items-center gap-2 mb-3">
+      {/* Seasonal Water Temperature Table & Mobile Cards */}
+      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h4 className="text-base font-black text-white flex items-center gap-2 mb-3.5">
           <Thermometer className="w-5 h-5 text-teal-400" />
           부산 광안리 계절별 평균 수온 & 장비 가이드
         </h4>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+
+        {/* Mobile Card List (< sm) */}
+        <div className="sm:hidden space-y-2.5">
+          {seasonalTemps.map((s, i) => (
+            <div key={i} className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/80">
+              <div className="flex items-center justify-between">
+                <span className="font-black text-white text-xs">{s.season}</span>
+                <span className="font-black text-cyan-300 text-xs bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/60">
+                  {s.temp}
+                </span>
+              </div>
+              <div className="mt-1.5 text-xs text-amber-200 font-semibold">
+                장비: <span className="text-slate-100">{s.suit}</span>
+              </div>
+              <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">💡 {s.note}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tablet & Desktop Table (>= sm) */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-200">
+            <thead className="bg-slate-800 text-slate-300 font-bold uppercase text-[11px]">
               <tr>
-                <th className="p-2.5 rounded-l-lg">계절 / 시기</th>
-                <th className="p-2.5">평균 표층 수온</th>
-                <th className="p-2.5">권장 슈트 / 장비</th>
-                <th className="p-2.5 rounded-r-lg">수영 유의사항</th>
+                <th className="p-3 rounded-l-lg">계절 / 시기</th>
+                <th className="p-3">평균 표층 수온</th>
+                <th className="p-3">권장 슈트 / 장비</th>
+                <th className="p-3 rounded-r-lg">수영 유의사항</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
               {seasonalTemps.map((s, i) => (
-                <tr key={i} className="hover:bg-slate-800/20 transition-colors">
-                  <td className="p-2.5 font-bold text-white">{s.season}</td>
-                  <td className="p-2.5 text-cyan-300 font-semibold">{s.temp}</td>
-                  <td className="p-2.5 text-slate-200">{s.suit}</td>
-                  <td className="p-2.5 text-slate-400">{s.note}</td>
+                <tr key={i} className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-3 font-bold text-white">{s.season}</td>
+                  <td className="p-3 text-cyan-300 font-black">{s.temp}</td>
+                  <td className="p-3 text-white font-medium">{s.suit}</td>
+                  <td className="p-3 text-slate-300">{s.note}</td>
                 </tr>
               ))}
             </tbody>

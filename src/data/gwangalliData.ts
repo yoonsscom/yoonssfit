@@ -267,3 +267,125 @@ export const TRIATHLON_DRILLS = [
     ]
   }
 ];
+
+export const GSR_CREW = {
+  name: 'Gwangalli Swimming Running',
+  code: 'GSR',
+  tagline: '새벽, 바다와 함께 시작하는 하루',
+  subTagline: '광안리에서 바다수영과 러닝을 즐기는 크루',
+  instagram: '@team__gsr',
+  instagramUrl: 'https://www.instagram.com/team__gsr',
+  purpose: '운동으로 삶의 질을 높이고, 몸과 마음의 균형을 찾는 모임입니다. 초보도, 느려도 괜찮아요. 중요한 건 꾸준함과 새벽을 이겨내는 의지!',
+  helpMessage: '못해도 부족해도 다 도와드리겠습니다.',
+  joinConditions: [
+    '20세 ~ 80년생 누구나 환영',
+    '수영 / 러닝 실력 무관 (초보자 적극 환영)',
+    '의지와 성실함만 있으면 OK'
+  ],
+  schedule: {
+    summer: '하계: 새벽 06:00 집결',
+    winter: '동계: 새벽 06:30 집결',
+    location: '광안리 백사장 중앙 (드론쇼 광장 & 만남의 광장 시계탑 앞)',
+    monthlyFee: '월 5,000원 (운영비 / 비상구급함 / 보급품 지원)'
+  },
+  mentors: [
+    { title: '수영 전문 강사진', badge: '다수 보유', desc: '자유형 자세 교정, 오픈워터 바다 호흡, 부표 턴 노하우 전수' },
+    { title: '철인 풀코스 완주자', badge: '다수 보유', desc: '수영 3.8km + 사이클 180km + 마라톤 42.195km 아이언맨 완주 경험' },
+    { title: '풀코스 마라톤 섭3(Sub-3)', badge: '다수 보유', desc: '2시간대 마라토너의 페이스 세팅, 케이던스, LSD 지속주 가이드' },
+    { title: '자전거 매장 및 공방 운영자', badge: '전문가 보유', desc: '로드/TT 바이크 피팅, 기재 점검, T1/T2 전환 훈련 지원' },
+    { title: '사진 & 영상 작가진', badge: '다수 보유', desc: '광안대교 일출을 배경으로 한 감성 바다수영 인생샷 및 훈련 릴스 제작' }
+  ],
+  officialEvents2026: [
+    {
+      id: 'gsr-event-1',
+      title: '2026 TEAM_GSR 광안리 아쿠아슬론',
+      category: '아쿠아슬론',
+      date: '2026년 6월 예정',
+      time: '06:00',
+      location: '광안리 해변 & 해안도로',
+      description: '바다수영 1.5km + 해안선 로드 러닝 10km 논스톱 아쿠아슬론 대회',
+      tag: '수영+러닝 콤보',
+      participantsCount: 38
+    },
+    {
+      id: 'gsr-event-2',
+      title: '2026 GSR 마라톤 챌린지',
+      category: '마라톤',
+      date: '2026년 가을 시즌',
+      time: '07:30',
+      location: '전국 마라톤 대회 동반 출전 (풀·하프·10K)',
+      description: '섭3 멘토진 페이서와 함께하는 PB(개인 최고기록) 달성 프로젝트',
+      tag: '풀·하프·10km',
+      participantsCount: 45
+    },
+    {
+      id: 'gsr-event-3',
+      title: '2026 GSR 철인3종 그랑프리 도전',
+      category: '철인3종',
+      date: '2026년 5월 ~ 10월',
+      time: '새벽/주말',
+      location: '통영/고성/제주 등 전국대회',
+      description: '올림픽 코스부터 킹코스 완주까지 GSR 철인 전용 훈련팀 합동 출전',
+      tag: '수영+자전거+러닝',
+      participantsCount: 24
+    },
+    {
+      id: 'gsr-event-4',
+      title: '2026 TEAM_GSR 가을 친선 대운동회',
+      category: '특별활동',
+      date: '2026년 10월 예정',
+      time: '09:00',
+      location: '광안리 삼익비치 잔디광장 & 해변',
+      description: '비치 릴레이, 줄다리기, 패들보드 레이스 및 뒷풀이 네트워킹',
+      tag: '크루 친목 페스티벌',
+      participantsCount: 60
+    }
+  ],
+  specialActivities: [
+    {
+      title: '광안대교 별그리기 5km',
+      icon: '⭐',
+      desc: '광안리 해변과 골목, 수변공원을 뛰거나 수영하며 스트라바 GPS 아트로 광안대교 별모양 완성하기'
+    },
+    {
+      title: '해운대 ➔ 광안리 해안 러닝 (7.5km)',
+      icon: '🌅',
+      desc: '동백섬과 마린시티, 민락교를 건너 광안리 백사장으로 이어지는 부산 최고의 오션뷰 선셋/모닝 런'
+    },
+    {
+      title: '송정 ➔ 광안리 수영/러닝 크로스 원정',
+      icon: '🌊',
+      desc: '송정 해변 서핑존 바다수영 후 광안리로 이어지는 장거리 엔듀런스 크로스 훈련'
+    },
+    {
+      title: '기장 해동용궁사 러닝 챌린지',
+      icon: '⛩️',
+      desc: '기장 오시리아 해안 절벽을 따라 용궁사로 달리는 주말 힐링 롱런'
+    },
+    {
+      title: '오륙도 & 울릉도 섬 원정 탐험',
+      icon: '🏝️',
+      desc: '오륙도 연안 바다수영 투어 및 울릉도 해양 원정 스윔 & 트레일러닝'
+    },
+    {
+      title: '8.15 광복절 기념 평화 러닝',
+      icon: '🇰🇷',
+      desc: '광복절 새벽 8.15km 광안리 해변을 함께 달리는 매년 정기 전통 행사'
+    },
+    {
+      title: '타 러닝·수영 모임과의 연합 운동회',
+      icon: '🤝',
+      desc: '부산 경남권 러닝 크루 및 바다수영 클럽과의 오픈 친선 교류전'
+    }
+  ],
+  ironmanSquad: {
+    name: 'GSR 철인 전용 훈련팀 (Ironman Squad)',
+    desc: '기본 체력 보유자 및 2026 공식 철인3종(트라이애슬론) 대회 출전을 준비하는 집중 훈련 그룹',
+    features: [
+      '오픈워터 바다수영 1.5km ~ 3.8km 인터벌 팩스위밍',
+      '사이클 + 러닝 브릭(Brick) 훈련 (광안리 ↔ 기장/간절곶 코스)',
+      'T1 / T2 전환 구역 장비 세팅 및 실전 트랜지션 시뮬레이션',
+      '대회 보급 플랜(파워젤, BCAA, 전해질) 및 심박수 존 관리 코칭'
+    ]
+  }
+};

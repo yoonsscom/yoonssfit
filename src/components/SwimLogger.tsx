@@ -49,9 +49,9 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
   const [buoyUsed, setBuoyUsed] = useState(true);
   const [waterTemp, setWaterTemp] = useState(19.8);
   const [perceivedEffort, setPerceivedEffort] = useState(7);
-  const [targetCategory, setTargetCategory] = useState<SwimLog['targetCategory']>('철인3종 훈련 (Triathlon)');
+  const [targetCategory, setTargetCategory] = useState<SwimLog['targetCategory']>('GSR 새벽 정기훈련');
   const [notes, setNotes] = useState('');
-  const [buddies, setBuddies] = useState('');
+  const [buddies, setBuddies] = useState('GSR 크루원들과 함께');
 
   // Stats calculation
   const totalDistanceKm = (logs.reduce((sum, l) => sum + l.distanceMeters, 0) / 1000).toFixed(1);
@@ -156,30 +156,30 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
       </div>
 
       {/* Control Actions Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3.5 shadow-lg">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto">
           {/* Search Box */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <div className="relative flex-1 sm:w-64">
+            <Search className="w-4 h-4 text-slate-300 absolute left-3 top-3" />
             <input
               type="text"
               placeholder="코스명, 메모, 버디 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 w-48 sm:w-60"
+              className="pl-9 pr-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 w-full"
             />
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
-            {['all', '철인3종', '체력단련'].map((cat) => (
+          <div className="flex items-center justify-around sm:justify-start gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+            {['all', 'GSR', '철인3종', '체력단련'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilterCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   filterCategory === cat
-                    ? 'bg-cyan-500 text-slate-950 font-bold'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-cyan-500 text-slate-950 shadow-md'
+                    : 'text-slate-200 hover:text-white'
                 }`}
               >
                 {cat === 'all' ? '전체' : cat}
@@ -188,21 +188,21 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
           <button
             onClick={onBackupToDrive}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-all"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-md active:scale-95 transition-all"
             title="훈련 일지를 Google Drive에 백업"
           >
             <CloudUpload className="w-4 h-4" />
-            Google Drive 동기화
+            <span>Drive 동기화</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md shadow-cyan-500/30 transition-all"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-md active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4" />
-            새 수영 일지 작성
+            <span>새 일지 작성</span>
           </button>
         </div>
       </div>
@@ -210,10 +210,10 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
       {/* Logs List Table / Cards */}
       <div className="space-y-3">
         {filteredLogs.length === 0 ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400">
-            <Activity className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-            <p className="text-sm font-medium">기록된 바다수영 일지가 없습니다.</p>
-            <p className="text-xs text-slate-500 mt-1">상단의 '새 수영 일지 작성' 버튼을 눌러 오늘 광안리 훈련을 기록해보세요.</p>
+          <div className="bg-slate-900 border border-slate-750 border-slate-700/80 rounded-2xl p-10 text-center text-slate-300">
+            <Activity className="w-10 h-10 text-slate-500 mx-auto mb-2" />
+            <p className="text-sm font-bold text-white">기록된 바다수영 일지가 없습니다.</p>
+            <p className="text-xs text-slate-300 mt-1">상단의 '새 일지 작성' 버튼을 눌러 오늘 광안리 훈련을 기록해보세요.</p>
           </div>
         ) : (
           filteredLogs.map((log) => {
@@ -221,66 +221,70 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
             return (
               <div
                 key={log.id}
-                className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-4 md:p-5 transition-all shadow-md"
+                className="bg-slate-900 border border-slate-700/90 hover:border-cyan-500/50 rounded-2xl p-4 sm:p-5 transition-all shadow-md"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded-lg border border-slate-700">
+                    <span className="text-xs font-black text-white bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
                       {log.date} ({log.startTime})
                     </span>
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                      className={`text-[11px] font-black px-2.5 py-0.5 rounded ${
                         log.targetCategory.includes('철인')
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                          ? 'bg-amber-500/25 text-amber-200 border border-amber-400/40'
+                          : 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/40'
                       }`}
                     >
                       {log.targetCategory}
                     </span>
-                    <span className="text-xs text-slate-300 font-semibold">{log.courseName}</span>
+                    <span className="text-xs sm:text-sm text-white font-bold">{log.courseName}</span>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400">수온 {log.waterTemp}℃</span>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-1 sm:pt-0">
+                    <span className="text-xs font-bold text-cyan-300 bg-cyan-950/70 px-2 py-0.5 rounded border border-cyan-800/60">
+                      수온 {log.waterTemp}℃
+                    </span>
                     <button
                       onClick={() => onDeleteLog(log.id)}
-                      className="p-1 rounded text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
                       title="일지 삭제"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
                 <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[11px]">수영 거리</span>
-                    <span className="text-base font-black text-white">{log.distanceMeters} m</span>
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 block text-[11px] font-medium">수영 거리</span>
+                    <span className="text-base sm:text-lg font-black text-white">{log.distanceMeters} m</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[11px]">소요 시간</span>
-                    <span className="text-base font-black text-white">{log.durationMinutes} 분</span>
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 block text-[11px] font-medium">소요 시간</span>
+                    <span className="text-base sm:text-lg font-black text-white">{log.durationMinutes} 분</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[11px]">평균 100m 페이스</span>
-                    <span className="text-base font-black text-cyan-300">{pacePer100}</span>
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 block text-[11px] font-medium">평균 100m 페이스</span>
+                    <span className="text-base sm:text-lg font-black text-cyan-300">{pacePer100}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[11px]">장비 / 슈트</span>
-                    <span className="text-xs font-semibold text-slate-200">{log.gearType}</span>
-                    {log.buoyUsed && (
-                      <span className="ml-1 text-[10px] text-amber-400 font-bold bg-amber-950/80 px-1 rounded">
-                        부이착용
-                      </span>
-                    )}
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 block text-[11px] font-medium">장비 / 안전부이</span>
+                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                      <span className="text-xs font-bold text-slate-100">{log.gearType.split(' ')[0]}</span>
+                      {log.buoyUsed && (
+                        <span className="text-[10px] text-amber-300 font-black bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-800/60">
+                          부이착용
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {log.notes && (
-                  <div className="mt-3 text-xs text-slate-300 bg-slate-800/40 p-2.5 rounded-xl border border-slate-800/60">
-                    <p className="leading-relaxed">💬 {log.notes}</p>
+                  <div className="mt-3 text-xs text-slate-200 bg-slate-800/60 p-3 rounded-xl border border-slate-700/80">
+                    <p className="leading-relaxed font-medium">💬 {log.notes}</p>
                     {log.buddies && (
-                      <p className="text-[11px] text-slate-400 mt-1">👥 동반 수영 버디: {log.buddies}</p>
+                      <p className="text-[11px] text-slate-300 mt-1.5 font-medium">👥 동반 버디: {log.buddies}</p>
                     )}
                   </div>
                 )}
@@ -395,6 +399,8 @@ export const SwimLogger: React.FC<SwimLoggerProps> = ({
                     onChange={(e) => setTargetCategory(e.target.value as any)}
                     className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
                   >
+                    <option value="GSR 새벽 정기훈련">🌊 GSR 새벽 정기훈련</option>
+                    <option value="GSR 철인 훈련팀">🔥 GSR 철인 전용 훈련팀</option>
                     <option value="철인3종 훈련 (Triathlon)">철인3종 훈련 (Triathlon)</option>
                     <option value="체력단련/피트니스 (Fitness)">체력단련/피트니스 (Fitness)</option>
                     <option value="바다적응/투어 (Tour)">바다적응/투어 (Tour)</option>
