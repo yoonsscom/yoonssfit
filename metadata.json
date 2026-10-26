@@ -1,0 +1,6 @@
+{
+  "name": "광안리 바다수영 & 트라이애슬론 메이트",
+  "description": "광안리 바다수영 및 철인3종(트라이애슬론) 오픈워터 훈련을 위한 실시간 해황, 조석·수온 정보, 훈련 로그 및 Google Drive 동기화",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
