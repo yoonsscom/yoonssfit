@@ -41,6 +41,13 @@ export const GWANGALLI_COURSES: SwimCourse[] = [
       [580, 460],
       [740, 450],
       [860, 430]
+    ],
+    geoPath: [
+      { lat: 35.1558, lng: 129.1245 },
+      { lat: 35.1545, lng: 129.1215 },
+      { lat: 35.1530, lng: 129.1185 },
+      { lat: 35.1508, lng: 129.1155 },
+      { lat: 35.1485, lng: 129.1132 }
     ]
   },
   {
@@ -60,6 +67,12 @@ export const GWANGALLI_COURSES: SwimCourse[] = [
       [500, 310],
       [780, 310],
       [500, 460]
+    ],
+    geoPath: [
+      { lat: 35.1532, lng: 129.1189 },
+      { lat: 35.1505, lng: 129.1235 },
+      { lat: 35.1528, lng: 129.1265 },
+      { lat: 35.1532, lng: 129.1189 }
     ]
   },
   {
@@ -80,6 +93,13 @@ export const GWANGALLI_COURSES: SwimCourse[] = [
       [580, 220],
       [780, 260],
       [860, 430]
+    ],
+    geoPath: [
+      { lat: 35.1485, lng: 129.1132 },
+      { lat: 35.1472, lng: 129.1240 },
+      { lat: 35.1492, lng: 129.1285 },
+      { lat: 35.1535, lng: 129.1260 },
+      { lat: 35.1558, lng: 129.1245 }
     ]
   },
   {
@@ -98,6 +118,11 @@ export const GWANGALLI_COURSES: SwimCourse[] = [
       [420, 455],
       [550, 460],
       [680, 455]
+    ],
+    geoPath: [
+      { lat: 35.1525, lng: 129.1175 },
+      { lat: 35.1535, lng: 129.1195 },
+      { lat: 35.1548, lng: 129.1221 }
     ]
   }
 ];
@@ -389,3 +414,73 @@ export const GSR_CREW = {
     ]
   }
 };
+
+export interface MaritimeLandmark {
+  id: string;
+  name: string;
+  category: 'safety' | 'meeting' | 'buoy' | 'landmark' | 'facility';
+  lat: number;
+  lng: number;
+  desc: string;
+  icon: string;
+  contact?: string;
+}
+
+export const GWANGALLI_LANDMARKS: MaritimeLandmark[] = [
+  {
+    id: 'lm-rescue-119',
+    name: '광안리 119 시민수상구조대',
+    category: 'safety',
+    lat: 35.1522,
+    lng: 129.1172,
+    desc: '해수욕장 개장 및 상시 긴급 인명구조, 자동심장충격기(AED) 및 응급처치소 운영',
+    icon: '🚨',
+    contact: '051-760-5119'
+  },
+  {
+    id: 'lm-police',
+    name: '부산해양경찰서 광안리출장소',
+    category: 'safety',
+    lat: 35.1552,
+    lng: 129.1238,
+    desc: '연안 해역 순찰 경비정 운영, 안전사고 예방 및 해상 조난 신고 접수',
+    icon: '👮‍♂️',
+    contact: '051-663-2212'
+  },
+  {
+    id: 'lm-ocean-buoy',
+    name: '국립해양조사원 광안리 해양관측부표',
+    category: 'buoy',
+    lat: 35.1500,
+    lng: 129.1250,
+    desc: '실시간 수온, 파고, 유속, 조위 실측 센서가 탑재된 외해 해양기상 관측부표',
+    icon: '🌊'
+  },
+  {
+    id: 'lm-gsr-hub',
+    name: '민락수변공원 GSR 새벽 집결지',
+    category: 'meeting',
+    lat: 35.1558,
+    lng: 129.1245,
+    desc: 'TEAM_GSR 정기 새벽 훈련(하계 06:00, 동계 06:30) 스트레칭 및 입수 준비 메인 집결지',
+    icon: '👥'
+  },
+  {
+    id: 'lm-gwangan-bridge',
+    name: '광안대교 현수교 주교각 (외해 뷰포인트)',
+    category: 'landmark',
+    lat: 35.1480,
+    lng: 129.1290,
+    desc: '광안리 바다수영 2.5km 장거리 챌린지 코스 정면 조망 주탑 지점 (유속 주의)',
+    icon: '🌉'
+  },
+  {
+    id: 'lm-shower',
+    name: '광안리 중앙 공공 샤워·탈의실 & 보관함',
+    category: 'facility',
+    lat: 35.1534,
+    lng: 129.1182,
+    desc: '오픈워터 수영 후 담수 샤워 및 장비 세척 가능 시설 (공공화장실 병설)',
+    icon: '🚿'
+  }
+];

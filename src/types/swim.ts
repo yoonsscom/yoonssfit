@@ -32,6 +32,7 @@ export interface SwimCourse {
   startPoint: { lat: number; lng: number; label: string };
   turnPoint: { lat: number; lng: number; label: string };
   coordinates: [number, number][]; // [x, y] in SVG canvas coordinates (0-1000, 0-600)
+  geoPath?: { lat: number; lng: number }[]; // Real GPS coordinates for Google Maps Polyline
 }
 
 export interface SwimLog {

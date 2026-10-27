@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SwimCourse } from '../types/swim';
 import { GWANGALLI_COURSES } from '../data/gwangalliData';
 import { exportCourseGpxToDrive, generateCourseGpx } from '../services/googleDrive';
+import { GwangalliGoogleMap } from './GwangalliGoogleMap';
 import {
   MapPin,
   Navigation,
@@ -15,7 +16,9 @@ import {
   Compass,
   Waves,
   Eye,
-  Info
+  Info,
+  Layers,
+  Map as MapIcon
 } from 'lucide-react';
 
 interface GwangalliCourseMapProps {
@@ -33,6 +36,7 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
   const [isSimulating, setIsSimulating] = useState(false);
   const [simProgress, setSimProgress] = useState(0); // 0 to 1
   const [isExportingDrive, setIsExportingDrive] = useState(false);
+  const [mapViewMode, setMapViewMode] = useState<'google' | 'illustration'>('google');
 
   // Animation loop for swimmer along the course coordinates
   useEffect(() => {
@@ -205,10 +209,64 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
         </div>
       </div>
 
-      {/* Interactive Map Visualizer */}
-      <div className="relative bg-slate-950 border border-slate-700/80 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Mobile Header & Action Bar (Outside SVG to avoid blocking sea view on small screens) */}
-        <div className="md:hidden p-3.5 bg-slate-900 border-b border-slate-800 space-y-2.5">
+      {/* Map Mode Switcher & Global Actions Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-3 sm:p-4 rounded-2xl">
+        <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-700/80">
+          <button
+            onClick={() => setMapViewMode('google')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black transition-all ${
+              mapViewMode === 'google'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <MapIcon className="w-3.5 h-3.5" />
+            Google Maps 위성/실시간 맵
+          </button>
+          <button
+            onClick={() => setMapViewMode('illustration')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black transition-all ${
+              mapViewMode === 'illustration'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            코스 그래픽 일러스트
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportToGoogleDrive}
+            disabled={isExportingDrive}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
+          >
+            <CloudUpload className={`w-3.5 h-3.5 ${isExportingDrive ? 'animate-bounce' : ''}`} />
+            {isExportingDrive ? 'Drive 저장 중...' : 'Google Drive GPX 백업'}
+          </button>
+          <button
+            onClick={handleDownloadGpx}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 shadow-md active:scale-95 transition-all whitespace-nowrap"
+          >
+            <Download className="w-3.5 h-3.5 text-cyan-400" />
+            GPX 다운로드 (워치)
+          </button>
+        </div>
+      </div>
+
+      {mapViewMode === 'google' ? (
+        <GwangalliGoogleMap
+          selectedCourse={selectedCourse}
+          isSimulating={isSimulating}
+          simProgress={simProgress}
+          onNotify={onNotify}
+        />
+      ) : (
+        /* Interactive Map Visualizer (SVG Illustration) */
+        <div className="relative bg-slate-950 border border-slate-700/80 rounded-2xl overflow-hidden shadow-2xl">
+          {/* Mobile Header & Action Bar (Outside SVG to avoid blocking sea view on small screens) */}
+          <div className="md:hidden p-3.5 bg-slate-900 border-b border-slate-800 space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -556,6 +614,7 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
           </svg>
         </div>
       </div>
+      )}
 
       {/* Selected Course Detail Information */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
