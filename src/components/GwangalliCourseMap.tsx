@@ -32,7 +32,7 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
   isGoogleAuthenticated = false,
   onRequestLogin,
 }) => {
-  const [selectedCourse, setSelectedCourse] = useState<SwimCourse>(GWANGALLI_COURSES[1]); // Default Olympic 1.5k
+  const [selectedCourse, setSelectedCourse] = useState<SwimCourse>(GWANGALLI_COURSES[0]); // Default 1.4km Coastline Crossing
   const [isSimulating, setIsSimulating] = useState(false);
   const [simProgress, setSimProgress] = useState(0); // 0 to 1
   const [isExportingDrive, setIsExportingDrive] = useState(false);
@@ -123,6 +123,49 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* GSR Crew Real Gathering & Entry Point Info Banner */}
+      <div className="bg-gradient-to-r from-blue-950/90 via-slate-900 to-indigo-950/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-5 shadow-lg relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 relative z-10">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black bg-cyan-500 text-slate-950 shadow-sm">
+                TEAM_GSR 공식 집결 &amp; 항로 안내
+              </span>
+              <span className="text-xs text-cyan-300 font-bold">실측 Plus Code 연동</span>
+            </div>
+            <h4 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+              🏖️ 44W7+VR 집결 ➔ 🚩 44W8+R3R 입수 ➔ 🏊 44W8+WW2 해상 집결 후 출발!
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-300">
+              남천협진태양 앞 화장실 파라솔(<strong>44W7+VR</strong>)에서 모여 짐 보관 후 백사장(<strong>44W8+R3R</strong>)으로 입수하고, 190m 앞바다 해상 부표(<strong>44W8+WW2</strong>)에 모여서 횡단 및 광안대교 왕복을 본격 출발합니다. 광안대교 왕복은 <strong>오른쪽 기둥 바로 옆(8Q7F44VG+PRP)</strong>을 찍고 돌아옵니다.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-purple-500/40 text-xs space-y-0.5">
+              <div className="text-[10px] text-purple-300 font-semibold">🏖️ 1. 육상집결(짐보관)</div>
+              <div className="font-mono font-bold text-purple-200">44W7+VR</div>
+            </div>
+            <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-emerald-500/40 text-xs space-y-0.5">
+              <div className="text-[10px] text-emerald-300 font-semibold">🚩 2. 백사장 입수</div>
+              <div className="font-mono font-bold text-emerald-200">44W8+R3R</div>
+            </div>
+            <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-cyan-500/50 text-xs space-y-0.5 ring-1 ring-cyan-400/30">
+              <div className="text-[10px] text-cyan-300 font-bold">🏊 3. 해상집결&amp;출발</div>
+              <div className="font-mono font-bold text-cyan-200">44W8+WW2</div>
+            </div>
+            <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-amber-500/40 text-xs space-y-0.5">
+              <div className="text-[10px] text-amber-300 font-semibold">🟡 횡단 턴 부표</div>
+              <div className="font-mono font-bold text-amber-200">8Q7F543F+495</div>
+            </div>
+            <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-rose-500/40 text-xs space-y-0.5">
+              <div className="text-[10px] text-rose-300 font-semibold">🌉 오른쪽 기둥 턴</div>
+              <div className="font-mono font-bold text-rose-200">8Q7F44VG+PRP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Course Selection Tabs */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -432,12 +475,18 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
                 <circle cx="0" cy="-2" r="3" fill="#f43f5e" /> {/* Red Aviation Beacon */}
               </g>
 
-              {/* Right Pylon */}
+              {/* Right Pylon (남천 방면 - 오른쪽 주교각) */}
               <g transform="translate(620, 50)">
                 <rect x="-8" y="0" width="16" height="85" fill="#cbd5e1" rx="2" />
                 <line x1="-8" y1="20" x2="8" y2="20" stroke="#475569" strokeWidth="2" />
                 <line x1="-8" y1="45" x2="8" y2="45" stroke="#475569" strokeWidth="2" />
-                <circle cx="0" cy="-2" r="3" fill="#f43f5e" />
+                <circle cx="0" cy="-2" r="3.5" fill="#f43f5e" /> {/* Red Aviation Beacon */}
+                {/* Visual indicator for right bridge pier turn target */}
+                <ellipse cx="25" cy="75" rx="12" ry="5" fill="#f43f5e" opacity="0.3" className="animate-ping" />
+                <rect x="15" y="62" width="150" height="22" rx="4" fill="#881337" stroke="#f43f5e" strokeWidth="1.2" opacity="0.95" />
+                <text x="20" y="76" fill="#fecdd3" fontSize="8" fontWeight="bold">
+                  📍 오른쪽 기둥 바로 옆 (8Q7F44VG+PRP)
+                </text>
               </g>
 
               {/* Suspension Cables */}
@@ -469,7 +518,7 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
               ))}
             </g>
 
-            {/* GWANGALLI BEACH & COASTLINE (Crescent Bay) */}
+            {/* GWANGALLI BEACH & COASTLINE (Crescent Bay) - Sea-facing perspective: Left=North/Millak, Right=South/Namcheon */}
             <g id="gwangalli-shoreline">
               {/* Sandy Beach Body */}
               <path
@@ -493,31 +542,42 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
                 fill="none"
               />
 
-              {/* Beach Landmarks */}
-              {/* Millak Fishery Port / Waterside Park (민락수변공원 방면 - 우측) */}
-              <g transform="translate(870, 520)">
-                <rect x="-40" y="-15" width="80" height="24" rx="4" fill="#1e293b" opacity="0.9" />
-                <text x="0" y="1" fill="#f1f5f9" fontSize="10" fontWeight="bold" textAnchor="middle">
-                  민락회타운 / 수변공원
+              {/* Beach Landmarks: Correct Sea-facing Orientation */}
+              {/* Left Side: North (Millak-dong / 민락회타운 & 횡단 반환 부표) */}
+              <g transform="translate(160, 520)">
+                <rect x="-65" y="-15" width="130" height="26" rx="4" fill="#1e293b" stroke="#f59e0b" strokeWidth="1" opacity="0.9" />
+                <text x="0" y="2" fill="#fde68a" fontSize="9" fontWeight="bold" textAnchor="middle">
+                  🟡 민락 반환부표 (8Q7F543F+495)
                 </text>
               </g>
 
-              {/* Center Plaza (TEAM_GSR 새벽 집결지 & 드론쇼 광장) */}
+              {/* Center Plaza (중앙 만남의 광장 & 119 수상구조대) */}
               <g transform="translate(500, 526)">
                 <rect x="-65" y="-18" width="130" height="32" rx="6" fill="#091b30" stroke="#06b6d4" strokeWidth="1.5" opacity="0.95" />
                 <text x="0" y="-3" fill="#38bdf8" fontSize="9" fontWeight="900" textAnchor="middle">
-                  🌊 TEAM_GSR 새벽 집결지
+                  🌊 광안리 해변 중앙
                 </text>
                 <text x="0" y="9" fill="#f8fafc" fontSize="8" fontWeight="bold" textAnchor="middle">
-                  하계 06:00 / 동계 06:30
+                  드론쇼 광장 &amp; 119 수상구조대
                 </text>
               </g>
 
-              {/* Samick Beach / Namcheon-dong (남천동 삼익비치 방면 - 좌측) */}
-              <g transform="translate(140, 530)">
-                <rect x="-40" y="-15" width="80" height="24" rx="4" fill="#1e293b" opacity="0.9" />
-                <text x="0" y="1" fill="#f1f5f9" fontSize="10" fontWeight="bold" textAnchor="middle">
-                  남천동 삼익비치
+              {/* Right Side: South (Namcheon-dong / 남천협진태양 집결지 & 백사장 입수지점) */}
+              <g transform="translate(840, 520)">
+                <rect x="-70" y="-18" width="140" height="36" rx="6" fill="#1e1b4b" stroke="#8b5cf6" strokeWidth="1.5" opacity="0.95" />
+                <text x="0" y="-4" fill="#c4b5fd" fontSize="9" fontWeight="bold" textAnchor="middle">
+                  🏖️ 1. 집결지 (44W7+VR 화장실)
+                </text>
+                <text x="0" y="9" fill="#34d399" fontSize="8" fontWeight="black" textAnchor="middle">
+                  🚩 2. 백사장 입수 (44W8+R3R)
+                </text>
+              </g>
+
+              {/* Offshore Assembly Buoy (44W8+WW2, 190m 해상 집결지) */}
+              <g transform="translate(815, 385)">
+                <rect x="-65" y="-14" width="130" height="24" rx="4" fill="#082f49" stroke="#06b6d4" strokeWidth="1.2" opacity="0.95" />
+                <text x="0" y="2" fill="#38bdf8" fontSize="8.5" fontWeight="black" textAnchor="middle">
+                  🏊 3. 해상 집결 부표 (44W8+WW2)
                 </text>
               </g>
             </g>
@@ -530,12 +590,12 @@ export const GwangalliCourseMap: React.FC<GwangalliCourseMapProps> = ({
               <circle key={i} cx={bx} cy={445 - Math.sin((bx / 1000) * Math.PI) * 12} r="4.5" fill="#facc15" stroke="#713f12" strokeWidth="1" />
             ))}
 
-            {/* TIDAL DRIFT DIRECTION VECTOR (밀물 시 남서 -> 북동) */}
-            <g transform="translate(320, 380)" opacity="0.6">
-              <line x1="0" y1="0" x2="80" y2="-15" stroke="#38bdf8" strokeWidth="2.5" strokeDasharray="4 3" />
-              <polygon points="80,-15 68,-22 72,-13 65,-9" fill="#38bdf8" />
-              <text x="40" y="18" fill="#7dd3fc" fontSize="9" textAnchor="middle">
-                밀물 조류 방향 (0.4 kt)
+            {/* TIDAL DRIFT DIRECTION VECTOR (밀물 시 남천(우측) -> 민락(좌측) 방향 연안류) */}
+            <g transform="translate(580, 360)" opacity="0.6">
+              <line x1="0" y1="0" x2="-80" y2="-12" stroke="#38bdf8" strokeWidth="2.5" strokeDasharray="4 3" />
+              <polygon points="-80,-12 -68,-6 -72,-15 -66,-18" fill="#38bdf8" />
+              <text x="-40" y="16" fill="#7dd3fc" fontSize="9" textAnchor="middle">
+                밀물 조류 방향 (남천 ➔ 민락)
               </text>
             </g>
 

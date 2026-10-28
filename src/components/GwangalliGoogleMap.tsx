@@ -71,7 +71,7 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
   const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('hybrid');
   const [selectedLandmark, setSelectedLandmark] = useState<MaritimeLandmark | null>(null);
   const [selectedCoursePoint, setSelectedCoursePoint] = useState<{
-    type: 'start' | 'turn';
+    type: 'start' | 'turn' | 'pier';
     title: string;
     lat: number;
     lng: number;
@@ -202,7 +202,7 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
             internalUsageAttributionIds={['gmp_git_agentskills_v1']}
             // Mandatory Map ID for AdvancedMarker support
             mapId="DEMO_MAP_ID"
-            defaultCenter={{ lat: 35.1532, lng: 129.1195 }}
+            defaultCenter={{ lat: 35.1485, lng: 129.1185 }}
             defaultZoom={15}
             mapTypeId={mapType}
             gestureHandling="greedy"
@@ -226,7 +226,7 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
             {/* Course Start Point Marker */}
             <AdvancedMarker
               position={selectedCourse.startPoint}
-              title={`출발지: ${selectedCourse.startPoint.label}`}
+              title={`출발/입수지점: ${selectedCourse.startPoint.label}`}
               onClick={() => {
                 setSelectedLandmark(null);
                 setSelectedCoursePoint({
@@ -234,7 +234,7 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
                   title: `🚩 출발/피니시: ${selectedCourse.startPoint.label}`,
                   lat: selectedCourse.startPoint.lat,
                   lng: selectedCourse.startPoint.lng,
-                  desc: '광안리 백사장 공식 입수 및 탈의/정리 포인트입니다. 입수 전 스트레칭과 안전부이 착용을 확인하세요.'
+                  desc: '남천동 협진태양 앞 백사장 공식 입수 및 피니시 구역입니다. (Plus Code: 44W8+R3R)'
                 });
               }}
             >
@@ -242,8 +242,31 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
                 background="#10b981"
                 borderColor="#047857"
                 glyphColor="#ffffff"
-                scale={1.2}
+                scale={1.25}
               />
+            </AdvancedMarker>
+
+            {/* Offshore Water Assembly Buoy Marker (44W8+WW2) */}
+            <AdvancedMarker
+              position={{ lat: 35.14725, lng: 129.11725 }}
+              title="해상 1차 집결 & 본격 출발 부표 (44W8+WW2)"
+              zIndex={75}
+              onClick={() => {
+                setSelectedLandmark(null);
+                setSelectedCoursePoint({
+                  type: 'turn',
+                  title: '🏊 해상 1차 집결 & 출발 부표 (44W8+WW2)',
+                  lat: 35.14725,
+                  lng: 129.11725,
+                  desc: '백사장 입수(44W8+R3R) 후 190m 전방으로 헤엄쳐 나와 전원 모인 뒤 횡단과 광안대교 왕복을 본격 출발하는 해상 집결지입니다. (Plus Code: 44W8+WW2)'
+                });
+              }}
+            >
+              <div className="relative flex items-center justify-center cursor-pointer group">
+                <div className="w-7 h-7 rounded-full bg-cyan-500/30 border-2 border-cyan-400 animate-pulse flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-xs">🏊</span>
+                </div>
+              </div>
             </AdvancedMarker>
 
             {/* Course Turn Point Marker */}
@@ -254,10 +277,10 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
                 setSelectedLandmark(null);
                 setSelectedCoursePoint({
                   type: 'turn',
-                  title: `🟡 턴 부표: ${selectedCourse.turnPoint.label}`,
+                  title: `🟡 반환 턴 부표: ${selectedCourse.turnPoint.label}`,
                   lat: selectedCourse.turnPoint.lat,
                   lng: selectedCourse.turnPoint.lng,
-                  desc: '코스 주요 회전 및 시야 확보(헤드업) 기준 부표입니다. 외해 조류 변화에 유의하세요.'
+                  desc: '코스 주요 회전 및 시야 확보(헤드업) 기준 부표입니다. 횡단 코스 반환점 Plus Code: 8Q7F543F+495'
                 });
               }}
             >
@@ -268,6 +291,44 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
                 scale={1.2}
               />
             </AdvancedMarker>
+
+            {/* Intermediate Turn Buoys for Multi-Turn Courses (e.g. Triangle Loop 2nd Turn) */}
+            {selectedCourse.geoPath &&
+              selectedCourse.geoPath.length > 3 &&
+              selectedCourse.geoPath.slice(1, selectedCourse.geoPath.length - 1).map((pt, idx) => {
+                const isSameAsStart =
+                  Math.abs(pt.lat - selectedCourse.startPoint.lat) < 0.0001 &&
+                  Math.abs(pt.lng - selectedCourse.startPoint.lng) < 0.0001;
+                const isSameAsTurn =
+                  Math.abs(pt.lat - selectedCourse.turnPoint.lat) < 0.0001 &&
+                  Math.abs(pt.lng - selectedCourse.turnPoint.lng) < 0.0001;
+                if (isSameAsStart || isSameAsTurn) return null;
+
+                return (
+                  <AdvancedMarker
+                    key={`inter-turn-${idx}`}
+                    position={pt}
+                    title="해상 회전 부표"
+                    onClick={() => {
+                      setSelectedLandmark(null);
+                      setSelectedCoursePoint({
+                        type: 'turn',
+                        title: `🔵 해상 경유/회전 부표`,
+                        lat: pt.lat,
+                        lng: pt.lng,
+                        desc: '광안리 해변 평행 구간 및 방향 전환을 위한 안전 해상 부표입니다.'
+                      });
+                    }}
+                  >
+                    <Pin
+                      background="#0ea5e9"
+                      borderColor="#0369a1"
+                      glyphColor="#ffffff"
+                      scale={1.1}
+                    />
+                  </AdvancedMarker>
+                );
+              })}
 
             {/* Real-time Swimmer Position Marker during Simulation */}
             {isSimulating && (
@@ -300,21 +361,25 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
             {/* Maritime Safety & Crew Landmarks */}
             {showLandmarks &&
               GWANGALLI_LANDMARKS.map((lm) => {
+                const isGathering = lm.id === 'lm-gsr-gathering';
+                const isBridgePier = lm.id === 'lm-gwangan-bridge-pier';
                 const getPinColor = () => {
+                  if (isGathering) return { bg: '#8b5cf6', border: '#6d28d9', scale: 1.3 };
+                  if (isBridgePier) return { bg: '#ec4899', border: '#be185d', scale: 1.25 };
                   switch (lm.category) {
                     case 'safety':
-                      return { bg: '#ef4444', border: '#b91c1c' };
+                      return { bg: '#ef4444', border: '#b91c1c', scale: 1.0 };
                     case 'meeting':
-                      return { bg: '#06b6d4', border: '#0891b2' };
+                      return { bg: '#06b6d4', border: '#0891b2', scale: 1.1 };
                     case 'buoy':
-                      return { bg: '#3b82f6', border: '#1d4ed8' };
+                      return { bg: '#3b82f6', border: '#1d4ed8', scale: 1.0 };
                     case 'facility':
-                      return { bg: '#8b5cf6', border: '#6d28d9' };
+                      return { bg: '#64748b', border: '#334155', scale: 0.95 };
                     default:
-                      return { bg: '#64748b', border: '#334155' };
+                      return { bg: '#64748b', border: '#334155', scale: 1.0 };
                   }
                 };
-                const color = getPinColor();
+                const style = getPinColor();
 
                 return (
                   <AdvancedMarker
@@ -327,10 +392,10 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
                     }}
                   >
                     <Pin
-                      background={color.bg}
-                      borderColor={color.border}
+                      background={style.bg}
+                      borderColor={style.border}
                       glyphColor="#ffffff"
-                      scale={1.0}
+                      scale={style.scale}
                     />
                   </AdvancedMarker>
                 );
@@ -401,15 +466,23 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span className="text-[11px]">출발지 (Start)</span>
+            <span className="text-[11px] font-bold text-emerald-300">입수/출수 (44W8+R3R)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+            <span className="text-[11px] font-bold text-cyan-300">해상 집결 (44W8+WW2)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span className="text-[11px]">반환 부표 (Turn)</span>
+            <span className="text-[11px] font-bold text-amber-300">횡단 턴 부표 (8Q7F543F+495)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+            <span className="text-[11px] font-bold text-purple-300">공식 집결지 (44W7+VR)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-1 bg-cyan-400 rounded"></span>
-            <span className="text-[11px]">실제 GPS 수영 항로 (Route)</span>
+            <span className="text-[11px]">선택 수영 항로</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
@@ -418,7 +491,7 @@ export const GwangalliGoogleMap: React.FC<GwangalliGoogleMapProps> = ({
         </div>
 
         <div className="text-[11px] text-slate-400 font-medium">
-          * Google Maps Platform 고해상도 위성 영상 &amp; 실시간 항로
+          * Google Maps Platform 실시간 해상 GPS 항로 &amp; 고해상도 위성 영상
         </div>
       </div>
     </div>

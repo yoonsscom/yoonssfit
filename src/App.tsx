@@ -14,6 +14,7 @@ import { ColdWaterWarningBanner } from './components/ColdWaterWarningBanner';
 import { playColdWaterWarningSound, sendBrowserNotification } from './utils/alertSound';
 import { CURRENT_GWANGALLI_CONDITION, INITIAL_SWIM_LOGS } from './data/gwangalliData';
 import { SwimLog, ColdWaterAlertSettings, MarineCondition } from './types/swim';
+import { fetchLiveGwangalliMarineCondition } from './services/weatherService';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
   const [isColdWaterModalOpen, setIsColdWaterModalOpen] = useState(false);
   const [marineCondition, setMarineCondition] = useState<MarineCondition>(CURRENT_GWANGALLI_CONDITION);
+  const [isWeatherLoading, setIsWeatherLoading] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
   // Cold Water Alert Settings (Default 18.0°C threshold as requested)
@@ -59,6 +61,32 @@ export default function App() {
       setToast(null);
     }, 4500);
   };
+
+  // Fetch real-time live marine & weather conditions for Gwangalli
+  const refreshLiveWeather = async (showNotification = false) => {
+    setIsWeatherLoading(true);
+    try {
+      const liveData = await fetchLiveGwangalliMarineCondition();
+      setMarineCondition(liveData);
+      if (showNotification) {
+        showToast(
+          `🌊 광안리 실시간 기상 관측 갱신 완료 (현재 기온 ${liveData.airTemp}℃ / 수온 ${liveData.waterTemp}℃ / 풍속 ${liveData.windSpeed}m/s)`,
+          'success'
+        );
+      }
+    } catch (e: any) {
+      if (showNotification) {
+        showToast('실시간 기상 데이터 갱신 중 문제가 발생했습니다.', 'error');
+      }
+    } finally {
+      setIsWeatherLoading(false);
+    }
+  };
+
+  // Load real-time weather automatically on app startup
+  useEffect(() => {
+    refreshLiveWeather(false);
+  }, []);
 
   // Sync logs to localStorage
   useEffect(() => {
@@ -223,7 +251,8 @@ export default function App() {
         {activeTab === 'marine' && (
           <MarineConditions
             condition={marineCondition}
-            onRefresh={() => showToast('광안리 연안 최신 해황 정보를 갱신했습니다.', 'success')}
+            onRefresh={() => refreshLiveWeather(true)}
+            isLiveLoading={isWeatherLoading}
             coldWaterSettings={coldWaterSettings}
             onOpenColdWaterModal={() => setIsColdWaterModalOpen(true)}
             onConditionChange={handleConditionChange}

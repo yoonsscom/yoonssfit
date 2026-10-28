@@ -17,6 +17,30 @@ export interface MarineCondition {
   safetyScore: number; // 0 - 100
   safetyLevel: '최적 (Optimal)' | '양호 (Good)' | '주의 (Caution)' | '입수 자제 (Restricted)';
   suitRecommendation: string;
+  source?: string;
+  isLive?: boolean;
+  lastUpdated?: string;
+  // Detailed real-time ocean & weather metrics
+  apparentTemp?: number; // 체감온도 (°C)
+  windGusts?: number; // 순간 최대 돌풍 (m/s)
+  windDirDeg?: number; // 풍향 각도 (0-360)
+  swellWaveHeight?: number; // 너울 파고 (m)
+  swellWavePeriod?: number; // 너울 주기 (s)
+  swellWaveDirection?: number; // 너울 방향 (deg)
+  windWaveHeight?: number; // 풍파/찹 파고 (m)
+  windWavePeriod?: number; // 풍파 주기 (s)
+  waveDirection?: number; // 통합 파향 각도 (deg)
+  waveDirectionText?: string; // e.g. '동남동 (ESE) 115°'
+  surfacePressure?: number; // 해면 기압 (hPa)
+  relativeHumidity?: number; // 습도 (%)
+  precipitation?: number; // 실시간 강수량 (mm)
+  sunrise?: string; // 일출 시각 (HH:mm)
+  sunset?: string; // 일몰 시각 (HH:mm)
+  uvIndex?: number; // 자외선 지수 (0 - 12+)
+  pm25?: number; // 초미세먼지 (㎍/㎥)
+  pm10?: number; // 미세먼지 (㎍/㎥)
+  aqiScore?: number; // AQI 수치
+  aqiStatus?: '좋음' | '보통' | '나쁨' | '매우나쁨';
 }
 
 export interface SwimCourse {
@@ -84,3 +108,64 @@ export interface GSREvent {
   tag: string;
   participantsCount: number;
 }
+
+export interface TideEvent {
+  time: string;
+  type: '고조(만조)' | '저조(간조)';
+  levelCm: number;
+}
+
+export interface HourlyForecast {
+  hour: string;
+  label: string;
+  waterTemp: number;
+  airTemp: number;
+  waveHeight: number;
+  windSpeed: number;
+  windDirection: string;
+  tideLevel: number;
+  safetyScore: number;
+  safetyLevel: '최적' | '양호' | '주의' | '입수 자제';
+}
+
+export interface DailyMarineForecast {
+  id: string;
+  date: string; // YYYY-MM-DD
+  dayOfWeek: string; // "화", "수", etc.
+  formattedDate: string; // "10.27 (화)"
+  isToday: boolean;
+  isTomorrow: boolean;
+  tideName: string; // e.g. "6물 (사리)"
+  tideCycle: '사리' | '조금' | '중조' | '무시';
+  tides: TideEvent[];
+  waterTempMin: number;
+  waterTempMax: number;
+  waterTempAvg: number;
+  waveHeightMin: number;
+  waveHeightMax: number;
+  windSpeedMin: number;
+  windSpeedMax: number;
+  windDirection: string;
+  safetyScore: number;
+  safetyLevel: '최적' | '양호' | '주의' | '입수 자제';
+  suitRecommendation: string;
+  summary: string;
+  gsrTrainingRecommendation: string;
+  sunrise: string;
+  sunset: string;
+  hourly: HourlyForecast[];
+}
+
+export interface MarineDataSource {
+  id: string;
+  organization: string;
+  agencyKo: string;
+  systemName: string;
+  itemsProvided: string[];
+  updateCycle: string;
+  description: string;
+  officialUrl: string;
+  badge: string;
+  icon: string;
+}
+

@@ -147,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }`}
               >
                 <Waves className="w-4 h-4" />
-                해황 & 안전 레이더
+                해황 & 7일 예보
               </button>
               <button
                 onClick={() => onTabChange('courses')}
@@ -255,7 +255,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className={`p-1 rounded-xl ${activeTab === 'marine' ? 'bg-cyan-500/20 text-cyan-300' : ''}`}>
               <Waves className="w-5 h-5 stroke-[2.2]" />
             </div>
-            <span className="text-[11px] mt-0.5 tracking-tight">해황</span>
+            <span className="text-[11px] mt-0.5 tracking-tight font-bold">해황·예보</span>
           </button>
 
           {/* Tab 2: Courses */}
